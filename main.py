@@ -5,32 +5,6 @@ import sqlite3
 import telebot
 from telebot import types
 
-
-db = sqlite3.connect('database.db')
-cur = db.cursor()
-cur.execute("""CREATE TABLE IF NOT EXISTS users (
-questions TEXT,
-answers TEXT)
-""")
-db.commit()
-
-DiffData = sqlite3.connect('database.db')
-DiffCur = DiffData.cursor()
-DiffCur.execute("""CREATE TABLE IF NOT EXISTS diffurs (
-questions TEXT,
-answers TEXT)
-""")
-DiffData.commit()
-
-connect = sqlite3.connect('database.db', check_same_thread=False)
-cursor = connect.cursor()
-cursor.execute("""CREATE TABLE IF NOT EXISTS marks (
-id key,
-score int)
-""")
-connect.commit()
-
-
 def RandomExcluding(a, b):
     while True:
         k = random.randint(0, a)
@@ -419,6 +393,7 @@ def BackToMenu1(message):
     if message.text == "Счет":
         us_id = message.from_user.id
         if us_id == 1251663121:
+
             Lexa(message)
         Congratualations(get_score(us_id), message)
         return
