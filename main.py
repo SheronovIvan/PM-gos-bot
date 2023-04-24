@@ -1,9 +1,10 @@
 import random
 from random import choice
 import sqlite3
-
+import datavoices
 import telebot
 from telebot import types
+
 
 def RandomExcluding(a, b):
     while True:
@@ -79,51 +80,9 @@ def Congratualations(n, message):
         return
 
 
-def IntegralQuestion(Num1):
-    question: object
-    Num1 = int(Num1)
-    db1 = sqlite3.connect('database.db')
-    cur2 = db1.cursor()
-    for question in cur2.execute('SELECT questions from users'):
-        rows = cur2.fetchall()[Num1]
-        cur2.close()
-        return rows
 
 
-def IntegralAnswer(Num2):
-    answer: object
-    Num2 = int(Num2)
-    db2 = sqlite3.connect('database.db')
-    cur3 = db2.cursor()
-    for answer in cur3.execute('SELECT answers from users'):
-        rows = cur3.fetchall()[Num2]
-        cur3.close()
-        return rows
 
-
-def DiffursQuestion(Num1):
-    question: object
-    Num1 = int(Num1)
-    db1 = sqlite3.connect('database.db')
-    cur2 = db1.cursor()
-    for question in cur2.execute('SELECT questions from diffurs'):
-        rows = cur2.fetchall()[Num1]
-        cur2.close()
-        return rows
-
-
-def DiffursAnswer(Num2):
-    answer: object
-    Num2 = int(Num2)
-    db2 = sqlite3.connect('database.db')
-    cur3 = db2.cursor()
-    for answer in cur3.execute('SELECT answers from diffurs'):
-        rows = cur3.fetchall()[Num2]
-        cur3.close()
-        return rows
-
-
-# QueryCountAll = "SELECT COUNT(Queue.idQueue) FROM Queue"
 
 bot = telebot.TeleBot('5666049325:AAFjDJSePFY28BtpPPb8adJu8LaAtH5G4AU')
 
@@ -146,7 +105,7 @@ def start(message):
     capch5 = types.KeyboardButton(' ∫∜xdx/3ln(x) ')
     capch6 = types.KeyboardButton(' ∫e^(-x²)dx ')
     capch7 = types.KeyboardButton(' ∫∛(x²)dx/(x²+1) ')
-    capch8 = types.KeyboardButton(' ∫arctgxdx/∛(x²) ')
+    capch8 = types.KeyboardButton(' ∫arctg(x)dx/∛(x²) ')
     markup.add(capch0, capch1, capch2, capch3, capch4, capch5, capch6, capch7, capch8)
 
     inf = f'Здравствуйте, {message.from_user.first_name} {message.from_user.last_name}'
@@ -201,7 +160,7 @@ def CheckIntRight(message):
 
 
 def AskIntQuestion(message):
-    Num = IntegralQuestion(b)
+    Num = datavoices.IntegralQuestion(b)
     bot.send_message(message.chat.id, text=f'{Num}')
     CheckIntAnswer0(message)
     return
@@ -235,31 +194,42 @@ def Func1(message):
 
 IntAns1: str
 IntAns2: str
+IntAns3: str
+
 
 
 @bot.message_handler(Func=lambda message: True)
 def CheckIntAnswer0(message):
     k = choice([i for i in range(0, a + 1) if i != b])
+    ans1 = [b, k]
+    k1 = choice([i for i in range(0, a + 1) if i not in ans1])
+
     # k = RandomExcluding(a, b)
     global IntAns1
     global IntAns2
-    list = [k, b]
-    random.shuffle(list)
-    IntAns1 = IntegralAnswer(list[0])
-    IntAns2 = IntegralAnswer(list[1])
+    global IntAns3
 
-    markup3 = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    list = [k, b, k1]
+    random.shuffle(list)
+    IntAns1 = datavoices.IntegralAnswer(list[0])
+    IntAns2 = datavoices.IntegralAnswer(list[1])
+    IntAns3 = datavoices.IntegralAnswer(list[2])
+
+
+    markup3 = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
     x4 = types.KeyboardButton(f'{IntAns1}')
     x5 = types.KeyboardButton(f'{IntAns2}')
+    x2 = types.KeyboardButton(f'{IntAns3}')
 
-    markup3.add(x4, x5)
+
+    markup3.add(x4, x5, x2)
     mess = bot.send_message(message.chat.id, text="Варианты ответа", reply_markup=markup3)
     bot.register_next_step_handler(mess, CheckIntAnswer1)
     return
 
 
 def CheckIntAnswer1(message):
-    if message.text == f"{IntAns2}" or message.text == f"{IntAns1}":
+    if message.text in [f"{IntAns1}", f"{IntAns2}", f"{IntAns3}"]: #f"{IntAns2}" or message.text == f"{IntAns1}":
         CheckIntAnswer2(message)
         return
     else:
@@ -270,7 +240,7 @@ def CheckIntAnswer1(message):
 
 
 def CheckIntAnswer2(message):
-    if message.text == f"{IntegralAnswer(b)}":
+    if message.text == f"{datavoices.IntegralAnswer(b)}":
         bot.send_message(message.chat.id, "Верно")
         us_id = message.from_user.id
         add_user(us_id)
@@ -320,7 +290,7 @@ def CheckDiffRight(message):
 
 
 def AskDiffQuestion(message):
-    Num = DiffursQuestion(n)
+    Num = datavoices.DiffursQuestion(n)
     bot.send_message(message.chat.id, text=f'{Num}')
     CheckDiffAnswer0(message)
     return
@@ -328,23 +298,28 @@ def AskDiffQuestion(message):
 
 DiffAns1: str
 DiffAns2: str
-
+DiffAns3: str
 
 @bot.message_handler(Func=lambda message: True)
 def CheckDiffAnswer0(message):
     k = choice([i for i in range(0, m + 1) if i != n])
+    ans1 = [n, k]
+    k1 = choice([i for i in range(0, m + 1) if i not in ans1])
     #k = RandomExcluding(m, n)
     global DiffAns1
     global DiffAns2
-    list = [k, n]
+    global DiffAns3
+    list = [k, n, k1]
     random.shuffle(list)
-    DiffAns1 = DiffursAnswer(list[0])
-    DiffAns2 = DiffursAnswer(list[1])
+    DiffAns1 = datavoices.DiffursAnswer(list[0])
+    DiffAns2 = datavoices.DiffursAnswer(list[1])
+    DiffAns3 = datavoices.DiffursAnswer(list[2])
 
-    markup3 = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    markup3 = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
     x4 = types.KeyboardButton(f'{DiffAns1}')
     x5 = types.KeyboardButton(f'{DiffAns2}')
-    markup3.add(x4, x5)
+    x3 = types.KeyboardButton(f'{DiffAns3}')
+    markup3.add(x4, x5, x3)
 
     mess = bot.send_message(message.chat.id, text="Варианты ответа", reply_markup=markup3)
     bot.register_next_step_handler(mess, CheckDiffAnswer1)
@@ -352,7 +327,7 @@ def CheckDiffAnswer0(message):
 
 
 def CheckDiffAnswer1(message):
-    if message.text == f"{DiffAns2}" or message.text == f"{DiffAns1}":
+    if message.text in [f"{DiffAns1}", f"{DiffAns2}", f"{DiffAns3}"]:
         CheckDiffAnswer2(message)
         return
     else:
@@ -362,7 +337,7 @@ def CheckDiffAnswer1(message):
 
 
 def CheckDiffAnswer2(message):
-    if message.text == f"{DiffursAnswer(n)}":
+    if message.text == f"{datavoices.DiffursAnswer(n)}":
         bot.send_message(message.chat.id, "Верно")
         us_id = message.from_user.id
         add_user(us_id)
