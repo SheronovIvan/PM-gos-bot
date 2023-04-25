@@ -53,14 +53,14 @@ def Congratualations(n, message):
     cur1.execute("select count(*) from diffurs")
     row_count1 = cur1.fetchone()
     cur1.close()
-    m = row_count1[0] - 2
+    m = row_count1[0] - 1
 
     dbthred2 = sqlite3.connect('database.db')
     cur2 = dbthred2.cursor()
     cur2.execute("select count(*) from users")
     row_count2 = cur2.fetchone()
     cur2.close()
-    a = row_count2[0] - 2
+    a = row_count2[0] - 1
 
     markup0 = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     price0 = types.KeyboardButton('Интегралы')
@@ -132,7 +132,7 @@ def StartIntHandler(message):
     row_count = cur1.fetchone()
     cur1.close()
     global a
-    a = row_count[0] - 2
+    a = row_count[0] - 1
     msg = bot.send_message(message.chat.id, f"Пиши номер вопроса от 0 до {a}")
     bot.register_next_step_handler(msg, CheckIntRight)
 
@@ -262,7 +262,7 @@ def StartDiffHandler(message):
     row_count = cur1.fetchone()
     cur1.close()
     global m
-    m = row_count[0] - 2
+    m = row_count[0] - 1
     msg = bot.send_message(message.chat.id, f"Пиши номер вопроса от 0 до {m}")
     bot.register_next_step_handler(msg, CheckDiffRight)
 
