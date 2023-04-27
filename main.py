@@ -13,7 +13,6 @@ def RandomExcluding(a, b):
             return k
 
 
-'''
 def RandomExcluding(a: int, b: int):
     if a == b:
         return random.randint(0, a-1)
@@ -21,7 +20,6 @@ def RandomExcluding(a: int, b: int):
     while k == b:
         k = random.randint(0, a)
     return k
-'''
 
 
 def add_user(user_id):
@@ -200,7 +198,8 @@ IntAns3: str
 
 @bot.message_handler(Func=lambda message: True)
 def CheckIntAnswer0(message):
-    k = choice([i for i in range(0, a + 1) if i != b])
+    k = RandomExcluding(a, b)
+    #k = choice([i for i in range(0, a + 1) if i != b])
     ans1 = [b, k]
     k1 = choice([i for i in range(0, a + 1) if i not in ans1])
 
@@ -302,7 +301,8 @@ DiffAns3: str
 
 @bot.message_handler(Func=lambda message: True)
 def CheckDiffAnswer0(message):
-    k = choice([i for i in range(0, m + 1) if i != n])
+    k = RandomExcluding(m, n)
+    #k = choice([i for i in range(0, m + 1) if i != n])
     ans1 = [n, k]
     k1 = choice([i for i in range(0, m + 1) if i not in ans1])
     #k = RandomExcluding(m, n)
