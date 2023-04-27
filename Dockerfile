@@ -7,7 +7,7 @@ WORKDIR /usr/src/app
 
 
 RUN pip install --user telebot
-RUN pip install --user sqlite3
+RUN pip install --user sqlite3py
 # run app
 CMD ["python", "main.py"]
 

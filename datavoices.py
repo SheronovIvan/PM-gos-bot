@@ -22,6 +22,14 @@ id key,
 score int)
 """)
 connect.commit()
+
+sol = sqlite3.connect('database.db')
+curp = sol.cursor()
+curp.execute("""CREATE TABLE IF NOT EXISTS solution (
+integral TEXT,
+diffurs TEXT)
+""")
+sol.commit()
 def IntegralQuestion(Num1):
     Num1 = int(Num1)
     db1 = sqlite3.connect('database.db')
@@ -60,3 +68,23 @@ def DiffursAnswer(Num2):
     rows = cur3.fetchall()[Num2][0]
     cur3.close()
     return rows
+
+def ChooseIntSolution(Num1):
+    Num1 = int(Num1)
+    db1 = sqlite3.connect('database.db')
+    cur2 = db1.cursor()
+    cur2.execute('SELECT integral from solution')
+    rows = cur2.fetchall()[Num1][0]
+    cur2.close()
+    return rows
+
+def ChooseDiffSolution(Num1):
+    Num1 = int(Num1)
+    db1 = sqlite3.connect('database.db')
+    cur2 = db1.cursor()
+    cur2.execute('SELECT diffurs from solution')
+    rows = cur2.fetchall()[Num1][0]
+    cur2.close()
+    return rows
+p = 0
+que = [IntegralQuestion(p),DiffursQuestion(p)]

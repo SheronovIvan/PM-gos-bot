@@ -6,20 +6,6 @@ import telebot
 from telebot import types
 
 
-def RandomExcluding(a, b):
-    while True:
-        k = random.randint(0, a)
-        if k != b:
-            return k
-
-
-def RandomExcluding(a: int, b: int):
-    if a == b:
-        return random.randint(0, a-1)
-    k = b
-    while k == b:
-        k = random.randint(0, a)
-    return k
 
 
 def add_user(user_id):
@@ -78,13 +64,46 @@ def Congratualations(n, message):
         return
 
 
-
-
-
-
 bot = telebot.TeleBot('5666049325:AAFjDJSePFY28BtpPPb8adJu8LaAtH5G4AU')
 
 
+def Alt(a, b):
+ k = choice([i for i in range(0, a + 1) if i != b])
+ ans0 = [b, k]
+ k1 = choice([i for i in range(0, a + 1) if i not in ans0])
+ c = [k, k1]
+ return c
+
+
+def ModAdd(a, m):
+    a = int(a)
+    m = int(m)
+    s = (a + 1) % m
+    s1 = (s + 1) % m
+    c = [s, s1]
+    return c
+
+def GetAns(a, b):
+    nums = [x for x in range(0, b+1) if x != a]
+    return random.sample(nums, 2)
+
+
+
+def RandomExcluding(a, b):
+    while True:
+        k = random.randint(0, a)
+        if k != b:
+            return k
+
+'''
+def RandomExcluding(a, b):
+    if a == b:
+        return random.randint(0, a-1)
+    k = b
+    while k == b:
+        k = random.randint(0, a)
+    return k
+'''
 @bot.message_handler(commands=['support'])
 def Lexa(message):
     for i in range(0, 10):
@@ -117,6 +136,33 @@ def start(message):
                            parse_mode='html')
 
     bot.register_next_step_handler(msg, Func)
+
+@bot.message_handler(content_types=['text'])
+def Func(message):
+    if message.text in ['∫√(sin(x))dx/x²(x+4)', '∫dx/√(x³+1)', '∫ln(x)dx/(x²-1)', '∫dx/√(x²-1)',
+                        '∫∜xdx/3ln(x)', '∫∛(x²)dx/(x²+1)']:
+
+        markup0 = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+        price0 = types.KeyboardButton('Интегралы')
+        vremya0 = types.KeyboardButton('Диффуры')
+        markup0.add(price0, vremya0)
+
+        mess = bot.send_message(message.chat.id, text="Выбирай", reply_markup=markup0)
+        bot.register_next_step_handler(mess, Func1)
+    else:
+        bot.send_message(message.chat.id, text="Вы робот!")
+        bot.send_message(message.chat.id, text="Давай по новой")
+        start(message)
+        return
+
+
+def Func1(message):
+    if message.text == "Интегралы":
+        StartIntHandler(message)
+    if message.text == "Диффуры":
+        StartDiffHandler(message)
+
+
 
 
 a = 0
@@ -164,31 +210,6 @@ def AskIntQuestion(message):
     return
 
 
-@bot.message_handler(content_types=['text'])
-def Func(message):
-    if message.text in ['∫√(sin(x))dx/x²(x+4)', '∫dx/√(x³+1)', '∫ln(x)dx/(x²-1)', '∫dx/√(x²-1)',
-                        '∫∜xdx/3ln(x)', '∫∛(x²)dx/(x²+1)', '∫arctgxdx/∛(x²)']:
-
-        markup0 = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-        price0 = types.KeyboardButton('Интегралы')
-        vremya0 = types.KeyboardButton('Диффуры')
-        markup0.add(price0, vremya0)
-
-        mess = bot.send_message(message.chat.id, text="Выбирай", reply_markup=markup0)
-        bot.register_next_step_handler(mess, Func1)
-    else:
-        bot.send_message(message.chat.id, text="Вы робот!")
-        bot.send_message(message.chat.id, text="Давай по новой")
-        start(message)
-        return
-
-
-def Func1(message):
-    if message.text == "Интегралы":
-        StartIntHandler(message)
-    if message.text == "Диффуры":
-        StartDiffHandler(message)
-
 
 IntAns1: str
 IntAns2: str
@@ -198,12 +219,14 @@ IntAns3: str
 
 @bot.message_handler(Func=lambda message: True)
 def CheckIntAnswer0(message):
-    k = RandomExcluding(a, b)
-    #k = choice([i for i in range(0, a + 1) if i != b])
+    k = ModAdd(b, a)[0]
+    k1 = ModAdd(b, a)[1]
+    '''
+    k = choice([i for i in range(0, a + 1) if i != b])
     ans1 = [b, k]
     k1 = choice([i for i in range(0, a + 1) if i not in ans1])
-
     # k = RandomExcluding(a, b)
+    '''
     global IntAns1
     global IntAns2
     global IntAns3
@@ -215,7 +238,7 @@ def CheckIntAnswer0(message):
     IntAns3 = datavoices.IntegralAnswer(list[2])
 
 
-    markup3 = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
+    markup3 = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
     x4 = types.KeyboardButton(f'{IntAns1}')
     x5 = types.KeyboardButton(f'{IntAns2}')
     x2 = types.KeyboardButton(f'{IntAns3}')
@@ -246,8 +269,19 @@ def CheckIntAnswer2(message):
         BackToMenu0(message)
 
     else:
-        bot.send_message(message.chat.id, "Неверно, может попробовать другой вопрос")
-        BackToMenu0(message)
+        markup3 = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True, row_width=2)
+        back = types.KeyboardButton(' Вернуться в меню ')
+        x5 = types.KeyboardButton(' Узнать решение ')
+        markup3.add(x5, back)
+        mess = bot.send_message(message.chat.id, "Неверно, может попробовать другой вопрос", reply_markup=markup3)
+        bot.register_next_step_handler(mess, CheckIntAnswer3)
+
+def CheckIntAnswer3(message):
+        if message.text == 'Узнать решение':
+            bot.send_message(message.chat.id, f"{datavoices.ChooseIntSolution(b)}")
+            BackToMenu0(message)
+        else:
+            BackToMenu0(message)
 
 
 m = 0
@@ -301,11 +335,14 @@ DiffAns3: str
 
 @bot.message_handler(Func=lambda message: True)
 def CheckDiffAnswer0(message):
-    k = RandomExcluding(m, n)
-    #k = choice([i for i in range(0, m + 1) if i != n])
+    k = ModAdd(n, m)[0]
+    k1 = ModAdd(n, m)[1]
+    '''
+    k = choice([i for i in range(0, m + 1) if i != n])
     ans1 = [n, k]
     k1 = choice([i for i in range(0, m + 1) if i not in ans1])
     #k = RandomExcluding(m, n)
+    '''
     global DiffAns1
     global DiffAns2
     global DiffAns3
@@ -343,8 +380,19 @@ def CheckDiffAnswer2(message):
         add_user(us_id)
         BackToMenu0(message)
     else:
-        bot.send_message(message.chat.id, "Неверно, может попробовать другой вопрос")
-        BackToMenu0(message)
+        markup3 = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True, row_width=2)
+        back = types.KeyboardButton(' Вернуться в меню ')
+        x5 = types.KeyboardButton(' Узнать решение ')
+        markup3.add(x5, back)
+        mess = bot.send_message(message.chat.id, "Неверно, может попробовать другой вопрос", reply_markup=markup3)
+        bot.register_next_step_handler(mess, CheckDiffAnswer3)
+
+def CheckDiffAnswer3(message):
+        if message.text == 'Узнать решение':
+            bot.send_message(message.chat.id, f"{datavoices.ChooseDiffSolution(b)}")
+            BackToMenu0(message)
+        else:
+            BackToMenu0(message)
 
 
 def BackToMenu0(message):
