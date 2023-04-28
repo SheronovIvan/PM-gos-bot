@@ -5,7 +5,7 @@ import datavoices
 import telebot
 from telebot import types
 
-
+p = 0
 
 
 def add_user(user_id):
@@ -155,12 +155,14 @@ def Func(message):
         start(message)
         return
 
-
 def Func1(message):
+    global p
     if message.text == "Интегралы":
         StartIntHandler(message)
+        p = 0
     if message.text == "Диффуры":
         StartDiffHandler(message)
+        p = 1
 
 
 
@@ -180,6 +182,16 @@ def StartIntHandler(message):
     msg = bot.send_message(message.chat.id, f"Пиши номер вопроса от 0 до {a}")
     bot.register_next_step_handler(msg, CheckIntRight)
 
+def StartDiffHandler(message):
+    dbthred1 = sqlite3.connect('database.db')
+    cur1 = dbthred1.cursor()
+    cur1.execute("select count(*) from diffurs")  # делаем запос на кол-во строк в таблице
+    row_count = cur1.fetchone()
+    cur1.close()
+    global a
+    a = row_count[0] - 1
+    msg = bot.send_message(message.chat.id, f"Пиши номер вопроса от 0 до {a}")
+    bot.register_next_step_handler(msg, CheckIntRight)
 
 def CheckIntRight(message):
     chat_id = message.chat.id
@@ -204,7 +216,7 @@ def CheckIntRight(message):
 
 
 def AskIntQuestion(message):
-    Num = datavoices.IntegralQuestion(b)
+    Num = datavoices.Question(b)[p]
     bot.send_message(message.chat.id, text=f'{Num}')
     CheckIntAnswer0(message)
     return
@@ -233,9 +245,9 @@ def CheckIntAnswer0(message):
 
     list = [k, b, k1]
     random.shuffle(list)
-    IntAns1 = datavoices.IntegralAnswer(list[0])
-    IntAns2 = datavoices.IntegralAnswer(list[1])
-    IntAns3 = datavoices.IntegralAnswer(list[2])
+    IntAns1 = datavoices.Answer(list[0])[p]
+    IntAns2 = datavoices.Answer(list[1])[p]
+    IntAns3 = datavoices.Answer(list[2])[p]
 
 
     markup3 = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
@@ -262,7 +274,7 @@ def CheckIntAnswer1(message):
 
 
 def CheckIntAnswer2(message):
-    if message.text == f"{datavoices.IntegralAnswer(b)}":
+    if message.text == f"{datavoices.Answer(b)[p]}":
         bot.send_message(message.chat.id, "Верно")
         us_id = message.from_user.id
         add_user(us_id)
@@ -278,7 +290,7 @@ def CheckIntAnswer2(message):
 
 def CheckIntAnswer3(message):
         if message.text == 'Узнать решение':
-            bot.send_message(message.chat.id, f"{datavoices.ChooseIntSolution(b)}")
+            bot.send_message(message.chat.id, f"{datavoices.ChooseSolution(b)[p]}")
             BackToMenu0(message)
         else:
             BackToMenu0(message)
@@ -288,111 +300,8 @@ m = 0
 n = 0
 
 
-def StartDiffHandler(message):
-    dbthred1 = sqlite3.connect('database.db')
-    cur1 = dbthred1.cursor()
-    cur1.execute("select count(*) from diffurs")  # делаем запос на кол-во строк в таблице
-    row_count = cur1.fetchone()
-    cur1.close()
-    global m
-    m = row_count[0] - 1
-    msg = bot.send_message(message.chat.id, f"Пиши номер вопроса от 0 до {m}")
-    bot.register_next_step_handler(msg, CheckDiffRight)
 
 
-def CheckDiffRight(message):
-    chat_id = message.chat.id
-    text = message.text
-    try:
-        num = int(text)
-        if 0 <= num <= m:
-            bot.send_message(chat_id, 'Вы выбрали ' + text + ' задание.')
-            global n
-            n = text
-            AskDiffQuestion(message)  # добавляем вызов AskDiffQuestion здесь
-            return
-        else:
-            bot.send_message(chat_id, 'Некорректный номер задания, попробуйте еще раз.')
-            mess = bot.send_message(chat_id, f"Пиши номер вопроса от 0 до {m}")
-            bot.register_next_step_handler(mess, CheckDiffRight)
-
-    except ValueError:
-        bot.send_message(chat_id, 'Введенное значение не является целым числом, попробуйте еще раз.')
-        mess = bot.send_message(chat_id, f"Пиши номер вопроса от 0 до {m}")
-        bot.register_next_step_handler(mess, CheckDiffRight)
-
-
-def AskDiffQuestion(message):
-    Num = datavoices.DiffursQuestion(n)
-    bot.send_message(message.chat.id, text=f'{Num}')
-    CheckDiffAnswer0(message)
-    return
-
-
-DiffAns1: str
-DiffAns2: str
-DiffAns3: str
-
-@bot.message_handler(Func=lambda message: True)
-def CheckDiffAnswer0(message):
-    k = ModAdd(n, m)[0]
-    k1 = ModAdd(n, m)[1]
-    '''
-    k = choice([i for i in range(0, m + 1) if i != n])
-    ans1 = [n, k]
-    k1 = choice([i for i in range(0, m + 1) if i not in ans1])
-    #k = RandomExcluding(m, n)
-    '''
-    global DiffAns1
-    global DiffAns2
-    global DiffAns3
-    list = [k, n, k1]
-    random.shuffle(list)
-    DiffAns1 = datavoices.DiffursAnswer(list[0])
-    DiffAns2 = datavoices.DiffursAnswer(list[1])
-    DiffAns3 = datavoices.DiffursAnswer(list[2])
-
-    markup3 = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
-    x4 = types.KeyboardButton(f'{DiffAns1}')
-    x5 = types.KeyboardButton(f'{DiffAns2}')
-    x3 = types.KeyboardButton(f'{DiffAns3}')
-    markup3.add(x4, x5, x3)
-
-    mess = bot.send_message(message.chat.id, text="Варианты ответа", reply_markup=markup3)
-    bot.register_next_step_handler(mess, CheckDiffAnswer1)
-    return
-
-
-def CheckDiffAnswer1(message):
-    if message.text in [f"{DiffAns1}", f"{DiffAns2}", f"{DiffAns3}"]:
-        CheckDiffAnswer2(message)
-        return
-    else:
-        bot.send_message(message.chat.id, text="Выбирай из тех вариантов, которые даны")
-        bot.send_message(message.chat.id, text="Там есть верный ответ)")
-        CheckDiffAnswer2(message)
-
-
-def CheckDiffAnswer2(message):
-    if message.text == f"{datavoices.DiffursAnswer(n)}":
-        bot.send_message(message.chat.id, "Верно")
-        us_id = message.from_user.id
-        add_user(us_id)
-        BackToMenu0(message)
-    else:
-        markup3 = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True, row_width=2)
-        back = types.KeyboardButton(' Вернуться в меню ')
-        x5 = types.KeyboardButton(' Узнать решение ')
-        markup3.add(x5, back)
-        mess = bot.send_message(message.chat.id, "Неверно, может попробовать другой вопрос", reply_markup=markup3)
-        bot.register_next_step_handler(mess, CheckDiffAnswer3)
-
-def CheckDiffAnswer3(message):
-        if message.text == 'Узнать решение':
-            bot.send_message(message.chat.id, f"{datavoices.ChooseDiffSolution(b)}")
-            BackToMenu0(message)
-        else:
-            BackToMenu0(message)
 
 
 def BackToMenu0(message):

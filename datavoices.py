@@ -86,5 +86,15 @@ def ChooseDiffSolution(Num1):
     rows = cur2.fetchall()[Num1][0]
     cur2.close()
     return rows
-p = 0
-que = [IntegralQuestion(p),DiffursQuestion(p)]
+
+def Question(p):
+    que = [IntegralQuestion(p), DiffursQuestion(p)]
+    return que
+
+def Answer(p):
+    que = [IntegralAnswer(p), DiffursAnswer(p)]
+    return que
+
+def ChooseSolution(p):
+    que = [ChooseIntSolution(p), ChooseDiffSolution(p)]
+    return que
