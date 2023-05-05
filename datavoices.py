@@ -87,13 +87,24 @@ def ChooseDiffSolution(Num1):
     cur2.close()
     return rows
 
-def Question(p):
-    que = [IntegralQuestion(p), DiffursQuestion(p)]
-    return que
 
-def Answer(p):
-    que = [IntegralAnswer(p), DiffursAnswer(p)]
-    return que
+def Question(p, index):
+    if index == 0:
+        question = IntegralQuestion(p)
+    elif index == 1:
+        question = DiffursQuestion(p)
+    else:
+        question = "Неверный индекс"
+    return question
+
+def Answer(p, index):
+    if index == 0:
+        answer = IntegralAnswer(p)
+    elif index == 1:
+        answer = DiffursAnswer(p)
+    else:
+        answer = "Неверный индекс"
+    return answer
 
 def ChooseSolution(p):
     que = [ChooseIntSolution(p), ChooseDiffSolution(p)]

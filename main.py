@@ -6,14 +6,17 @@ import telebot
 from telebot import types
 
 p = 0
+bot = telebot.TeleBot('5666049325:AAFjDJSePFY28BtpPPb8adJu8LaAtH5G4AU')
 
-
-def add_user(user_id):
+def add_user(user_id, message):
     conn = sqlite3.connect('database.db', check_same_thread=False)
     c = conn.cursor()
 
     c.execute("SELECT * FROM marks WHERE id = ?", (user_id,))
     user = c.fetchone()
+    inf1 = f'{message.from_user.first_name} {message.from_user.last_name} {message.from_user.id}'
+    to_chat_id2 = -1001871324787
+    bot.send_message(chat_id=to_chat_id2, text=f"{inf1}")
     if user:
         c.execute("UPDATE marks SET score = score + 1 WHERE id = ?", (user_id,))
     else:
@@ -64,7 +67,7 @@ def Congratualations(n, message):
         return
 
 
-bot = telebot.TeleBot('5666049325:AAFjDJSePFY28BtpPPb8adJu8LaAtH5G4AU')
+
 
 
 def Alt(a, b):
@@ -109,7 +112,7 @@ def Lexa(message):
     for i in range(0, 10):
         bot.send_message(message.chat.id, '<b>Лех, надо брать академ)</b>',
                          parse_mode='html')
-
+    start(message)
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -137,8 +140,27 @@ def start(message):
 
     bot.register_next_step_handler(msg, Func)
 
+
+@bot.message_handler(commands=['question'])
+def ques(message):
+    markup0 = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    price0 = types.KeyboardButton('Интегралы')
+    vremya0 = types.KeyboardButton('Диффуры')
+    markup0.add(price0, vremya0)
+    mess = bot.send_message(message.chat.id, text="Выбирай", reply_markup=markup0)
+    bot.register_next_step_handler(mess, Func1)
+
+
 @bot.message_handler(content_types=['text'])
+def Robot(message):
+    bot.send_message(message.chat.id, text="Вы робот!")
+    bot.send_message(message.chat.id, text="Давай по новой")
+    start(message)
+    return
+
+
 def Func(message):
+
     if message.text in ['∫√(sin(x))dx/x²(x+4)', '∫dx/√(x³+1)', '∫ln(x)dx/(x²-1)', '∫dx/√(x²-1)',
                         '∫∜xdx/3ln(x)', '∫∛(x²)dx/(x²+1)']:
 
@@ -154,6 +176,7 @@ def Func(message):
         bot.send_message(message.chat.id, text="Давай по новой")
         start(message)
         return
+
 
 def Func1(message):
     global p
@@ -216,7 +239,7 @@ def CheckIntRight(message):
 
 
 def AskIntQuestion(message):
-    Num = datavoices.Question(b)[p]
+    Num = datavoices.Question(b, p)
     bot.send_message(message.chat.id, text=f'{Num}')
     CheckIntAnswer0(message)
     return
@@ -245,9 +268,9 @@ def CheckIntAnswer0(message):
 
     list = [k, b, k1]
     random.shuffle(list)
-    IntAns1 = datavoices.Answer(list[0])[p]
-    IntAns2 = datavoices.Answer(list[1])[p]
-    IntAns3 = datavoices.Answer(list[2])[p]
+    IntAns1 = datavoices.Answer(list[0], p)
+    IntAns2 = datavoices.Answer(list[1], p)
+    IntAns3 = datavoices.Answer(list[2], p)
 
 
     markup3 = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
@@ -274,10 +297,10 @@ def CheckIntAnswer1(message):
 
 
 def CheckIntAnswer2(message):
-    if message.text == f"{datavoices.Answer(b)[p]}":
+    if message.text == f"{datavoices.Answer(b, p)}":
         bot.send_message(message.chat.id, "Верно")
         us_id = message.from_user.id
-        add_user(us_id)
+        add_user(us_id, message)
         BackToMenu0(message)
 
     else:
@@ -294,11 +317,6 @@ def CheckIntAnswer3(message):
             BackToMenu0(message)
         else:
             BackToMenu0(message)
-
-
-m = 0
-n = 0
-
 
 
 
