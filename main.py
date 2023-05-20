@@ -1,12 +1,15 @@
 import random
 from random import choice
+from admin import admin_id
+from admin import bot
+from admin import Admin1
 import sqlite3
 import datavoices
-import telebot
 from telebot import types
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+
 
 p = 0
-bot = telebot.TeleBot('5666049325:AAFjDJSePFY28BtpPPb8adJu8LaAtH5G4AU')
 
 def add_user(user_id, message):
     conn = sqlite3.connect('database.db', check_same_thread=False)
@@ -116,6 +119,13 @@ def Lexa(message):
 
 @bot.message_handler(commands=['start'])
 def start(message):
+   us_id = message.from_user.id
+   if us_id == admin_id:
+        button1 = InlineKeyboardButton("Админ режим", callback_data='button1')
+        button2 = InlineKeyboardButton("Обычный режим", callback_data='button2')
+        markup = InlineKeyboardMarkup().add(button1, button2)
+        bot.send_message(message.chat.id, "Выберите опцию:", reply_markup=markup)
+   else:
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
     capch0 = types.KeyboardButton(' ∫√(sin(x))dx/x²(x+4) ')
     capch1 = types.KeyboardButton(' ∫dx/√(x³+1) ')
@@ -158,7 +168,23 @@ def Robot(message):
     start(message)
     return
 
+cur_call = None
 
+@bot.callback_query_handler(func=lambda call: call.data in ['button1', 'button2'] )
+def handle_inline_button(call):
+    if call.data == 'button1':
+        global cur_call
+        cur_call = call
+        Admin1(cur_call)
+        bot.answer_callback_query(call.id)
+    elif call.data == 'button2':
+        markup0 = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+        price0 = types.KeyboardButton('Интегралы')
+        vremya0 = types.KeyboardButton('Диффуры')
+        markup0.add(price0, vremya0)
+        mess = bot.send_message(chat_id=admin_id, text="Выбирай", reply_markup=markup0)
+        bot.register_next_step_handler(mess, Func1)
+        bot.answer_callback_query(call.id)
 def Func(message):
 
     if message.text in ['∫√(sin(x))dx/x²(x+4)', '∫dx/√(x³+1)', '∫ln(x)dx/(x²-1)', '∫dx/√(x²-1)',
